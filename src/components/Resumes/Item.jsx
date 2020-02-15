@@ -1,7 +1,6 @@
 import React from "react";
 import scss from './style/Item.module.scss';
 const Item = ({ items }) => {
-  console.log(items);
   return items.length
     ? items.map(item => (
         <div key={item.id} className={scss.item}>

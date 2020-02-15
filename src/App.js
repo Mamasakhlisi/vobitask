@@ -1,24 +1,60 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState, useEffect} from 'react';
+import axios from "axios";
+import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import Jobs from './components/Jobs/Jobs';
+import Resume from './components/Resumes/Resume';
+import { createGlobalStyle } from "styled-components";
 
+const GlobalStyle = createGlobalStyle`
+  * {
+    margin:0;
+    padding:0;
+  } 
+`;
 function App() {
+  const [state, setState] = useState({
+    jobs: [],
+    resume: {
+      name: '',
+      lastname: '',
+      employer: '',
+      position: '',
+      email: '',
+      phone: '',
+      file: '',
+      motivation: ''
+    }
+  })
+  const resumeFormHandler = (e) => {
+    setState({
+      ...state,
+      resume: {
+        ...state.resume,
+        [e.target.name]: e.target.value
+      }
+    })
+  }
+  const resumeFormSubmit = (e) => {
+    e.preventDefault();
+    console.log(state.resume)
+  }
+  useEffect(() => {
+    axios.get("http://localhost:3004/jobs")
+      .then(res => setState({...state, jobs: res.data}))
+  }, [])
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <GlobalStyle />
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <Jobs jobs={state.jobs} />
+          </Route>
+          <Route path="/resume/:resume_id">
+            <Resume resumeFormHandler={resumeFormHandler} resumeFormSubmit={resumeFormSubmit}/>
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 }
